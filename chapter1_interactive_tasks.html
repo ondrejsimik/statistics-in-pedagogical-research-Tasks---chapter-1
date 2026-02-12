@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chapter 1 – Interactive Student Tasks (Statistics in Educational Research)</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#111a33;
+      --muted:#8ea0c6;
+      --text:#e8eeff;
+      --accent:#6ea8fe;
+      --accent2:#a78bfa;
+      --ok:#22c55e;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --border:rgba(255,255,255,.12);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(110,168,254,.25), transparent 60%),
+                  radial-gradient(1200px 600px at 110% 30%, rgba(167,139,250,.25), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.45;
+    }
+    header{
+      padding:28px 18px 10px;
+      max-width:1100px; margin:0 auto;
+    }
+    h1{margin:0 0 6px; font-size: clamp(20px, 2.5vw, 32px); letter-spacing:.2px}
+    .sub{color:var(--muted); margin:0 0 16px; font-size: 14px}
+    .toolbar{
+      display:flex; gap:10px; flex-wrap:wrap;
+      padding:12px 0 6px;
+      align-items:center;
+    }
+    .pill{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      padding:8px 10px; border-radius:999px;
+      font-size:13px; color:var(--muted);
+      display:flex; gap:8px; align-items:center;
+    }
+    .btn{
+      cursor:pointer; user-select:none;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(110,168,254,.18), rgba(110,168,254,.06));
+      color:var(--text);
+      padding:10px 12px; border-radius:12px;
+      box-shadow: var(--shadow);
+      transition: transform .05s ease, border-color .2s ease, background .2s ease;
+      font-weight:600; font-size:13px;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(110,168,254,.55)}
+    .btn.secondary{
+      background: rgba(255,255,255,.04);
+      box-shadow:none;
+      font-weight:600;
+    }
+    .btn.danger{
+      background: linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.08));
+    }
+    main{max-width:1100px; margin:0 auto; padding: 10px 18px 30px;}
+    .layout{
+      display:grid;
+      grid-template-columns: 320px 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 900px){
+      .layout{grid-template-columns: 1fr}
+      .sidebar{position:relative; top:0}
+    }
+    .card{
+      background: rgba(255,255,255,.035);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card h2{
+      margin:0;
+      font-size:15px;
+      padding:14px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      color: #f2f6ff;
+      display:flex; justify-content:space-between; align-items:center;
+      gap:10px;
+    }
+    .card .content{padding:14px}
+    .sidebar{
+      position: sticky; top: 14px;
+    }
+    .list{
+      display:flex; flex-direction:column; gap:8px;
+      max-height: calc(100vh - 170px);
+      overflow:auto;
+      padding-right: 4px;
+    }
+    .item{
+      cursor:pointer;
+      padding:10px 10px;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
+      transition: border-color .2s ease, background .2s ease;
+    }
+    .item:hover{border-color: rgba(110,168,254,.55); background: rgba(110,168,254,.06)}
+    .item.active{border-color: rgba(110,168,254,.8); background: rgba(110,168,254,.10)}
+    .tag{
+      font-size:11px; padding:3px 8px; border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .tag.done{border-color: rgba(34,197,94,.45); color: rgba(34,197,94,.9); background: rgba(34,197,94,.10)}
+    .tag.todo{border-color: rgba(245,158,11,.45); color: rgba(245,158,11,.95); background: rgba(245,158,11,.10)}
+    .qtitle{font-weight:700; font-size:13px}
+    .qdesc{color:var(--muted); font-size:12px; margin-top:2px}
+    .question{
+      padding:16px 16px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .question h3{margin:0 0 6px; font-size:18px}
+    .question p{margin: 6px 0; color: #dbe4ff}
+    .question .meta{color:var(--muted); font-size:12px}
+    .answerBlock{padding:16px}
+    textarea, input[type="text"], input[type="number"], select{
+      width:100%;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      outline: none;
+      font-size: 14px;
+    }
+    textarea{min-height: 140px; resize: vertical}
+    label{display:block; margin:10px 0 6px; color:var(--muted); font-size:12px}
+    .grid2{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+    @media (max-width: 700px){ .grid2{grid-template-columns:1fr} }
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .mini{font-size:12px; color:var(--muted)}
+    details{
+      border-top: 1px dashed rgba(255,255,255,.18);
+      margin-top: 14px;
+      padding-top: 12px;
+    }
+    details summary{
+      cursor:pointer;
+      font-weight:800;
+      color: var(--accent);
+      list-style:none;
+      outline:none;
+    }
+    details summary::-webkit-details-marker{display:none}
+    .solution{
+      margin-top:10px;
+      padding:12px;
+      border-radius: 12px;
+      border:1px solid rgba(110,168,254,.28);
+      background: rgba(110,168,254,.08);
+      color:#eaf1ff;
+    }
+    .foot{
+      padding: 12px 16px 16px;
+      border-top:1px solid rgba(255,255,255,.08);
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      border:1px solid rgba(255,255,255,.14);
+      padding:2px 7px; border-radius: 8px;
+      color: var(--muted);
+      background: rgba(255,255,255,.04);
+    }
+    .progress{
+      height:10px; background: rgba(255,255,255,.06);
+      border-radius:999px; overflow:hidden; border:1px solid rgba(255,255,255,.10);
+      width: 180px;
+    }
+    .progress > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(110,168,254,.95), rgba(167,139,250,.95));
+    }
+    .note{
+      font-size: 12px; color: var(--muted);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Chapter 1 – Interactive Student Tasks</h1>
+  <p class="sub">Fill in answers, self-check solutions, and export your responses. Your work is saved automatically in your browser (localStorage).</p>
+
+  <div class="toolbar">
+    <button class="btn" id="exportBtn">Download answers (.json)</button>
+    <button class="btn secondary" id="exportTxtBtn">Download answers (.txt)</button>
+    <button class="btn secondary" id="copyBtn">Copy answers to clipboard</button>
+    <button class="btn danger" id="resetBtn">Reset all answers</button>
+
+    <div class="pill">
+      <span class="mini">Progress</span>
+      <div class="progress" aria-label="progress"><div id="progressBar"></div></div>
+      <span class="mini" id="progressText">0/0</span>
+    </div>
+
+    <div class="pill">
+      <span class="mini">Tips:</span>
+      <span class="kbd">Ctrl</span> + <span class="kbd">S</span>
+      <span class="mini">• Use <b>Show solution</b> only after trying.</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="layout">
+    <section class="card sidebar">
+      <h2>
+        <span>Task list</span>
+        <span class="mini" id="countText"></span>
+      </h2>
+      <div class="content">
+        <div class="list" id="taskList"></div>
+        <div class="note">
+          Works offline. To share via a URL, upload this single HTML file to GitHub Pages / Netlify / your LMS as a web page.
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="question" id="questionHeader"></div>
+      <div class="answerBlock" id="answerArea"></div>
+      <div class="foot">
+        <div class="row">
+          <button class="btn secondary" id="prevBtn">← Previous</button>
+          <button class="btn secondary" id="nextBtn">Next →</button>
+        </div>
+        <div class="mini">Autosave is ON • Data stays on this device/browser</div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const TASKS = [
+  { id:"1.1", title:"Define key terms", type:"multi_text",
+    prompt:`Based on the text you have read, define the following terms. You may use your own words, but capture the essence of each term.`,
+    fields:[{key:"statistics",label:"Statistics"},{key:"descriptive",label:"Descriptive statistics"},{key:"inferential",label:"Inferential statistics"}],
+    solutionHtml:`<div class="solution">
+      <p><b>Statistics:</b> A discipline focused on collecting, analyzing, interpreting, presenting, and organizing data.</p>
+      <p><b>Descriptive statistics:</b> Tools for summarizing and describing data (mean/median/mode; variance/SD/range; graphs).</p>
+      <p><b>Inferential statistics:</b> Methods for drawing conclusions about a population from a sample (hypothesis testing, estimation, confidence intervals).</p>
+    </div>`
+  },
+  { id:"1.2", title:"Descriptive vs. inferential", type:"mc_matrix",
+    prompt:`Assign each example to <b>Descriptive</b> or <b>Inferential</b> statistics.`,
+    rows:[
+      {k:"a", text:"Testing a hypothesis whether a new teaching method improves student outcomes.", correct:"Inferential"},
+      {k:"b", text:"Calculating the average test score.", correct:"Descriptive"},
+      {k:"c", text:"Testing whether differences between groups of students are statistically significant.", correct:"Inferential"},
+      {k:"d", text:"Using a graph to display the distribution of students’ scores.", correct:"Descriptive"},
+      {k:"e", text:"Predicting how socioeconomic status will affect students’ future performance.", correct:"Inferential"},
+    ],
+    options:["Descriptive","Inferential"],
+    solutionHtml:`<div class="solution"><ul>
+      <li>(a) Inferential</li><li>(b) Descriptive</li><li>(c) Inferential</li><li>(d) Descriptive</li><li>(e) Inferential</li>
+    </ul></div>`
+  },
+  { id:"1.3", title:"How would you use statistics?", type:"multi_text",
+    prompt:`Briefly describe how you would use statistics to address each problem.`,
+    fields:[
+      {key:"s1", label:"Different results across schools in national tests"},
+      {key:"s2", label:"Effect of a new teaching method on mathematics performance"},
+      {key:"s3", label:"Effect of attendance on performance during the year"},
+      {key:"s4", label:"Relationship between study time and test results"},
+      {key:"s5", label:"Different instructional materials (text vs multimedia) and understanding"},
+      {key:"s6", label:"Math grades vs science results relationship"},
+      {key:"s7", label:"Effect of a reading program on reading literacy results"},
+    ],
+    solutionHtml:`<div class="solution"><ul>
+      <li><b>Schools:</b> ANOVA or t-test to compare means.</li>
+      <li><b>New method:</b> Paired t-test (pre/post) or alternatives.</li>
+      <li><b>Attendance:</b> Regression predicting performance from attendance.</li>
+      <li><b>Study time:</b> Correlation / regression.</li>
+      <li><b>Materials:</b> ANOVA across material types.</li>
+      <li><b>Math & science:</b> Correlation analysis.</li>
+      <li><b>Reading program:</b> Paired t-test / repeated-measures ANOVA / Wilcoxon.</li>
+    </ul></div>`
+  },
+  { id:"1.4", title:"Short essay (150–200 words)", type:"textarea",
+    prompt:`Write a short essay (150–200 words): <b>“Why is statistics essential for objective research in education?”</b>`,
+    key:"essay_1_4",
+    solutionHtml:`<div class="solution"><p><i>Example:</i> Statistics is essential for objective research in education because it provides methodological tools that ensure accuracy, reliability, and objectivity...</p></div>`
+  },
+  { id:"1.5", title:"Quantitative vs qualitative", type:"mc_matrix",
+    prompt:`Decide whether each description is <b>Quantitative</b> or <b>Qualitative</b>.`,
+    rows:[
+      {k:"a", text:"Number of books students read during the school year.", correct:"Quantitative"},
+      {k:"b", text:"Students’ answers: “How do you feel during exams?”", correct:"Qualitative"},
+      {k:"c", text:"Height of sixth-grade students.", correct:"Quantitative"},
+      {k:"d", text:"Teachers’ opinions about a new teaching method.", correct:"Qualitative"},
+      {k:"e", text:"Time students spend on homework each week.", correct:"Quantitative"},
+      {k:"f", text:"Colors of school uniforms in three schools.", correct:"Qualitative"},
+    ],
+    options:["Quantitative","Qualitative"],
+    solutionHtml:`<div class="solution"><ul>
+      <li>a Quantitative</li><li>b Qualitative</li><li>c Quantitative</li><li>d Qualitative</li><li>e Quantitative</li><li>f Qualitative</li>
+    </ul></div>`
+  },
+  { id:"1.6", title:"Choose data type + explain", type:"qa_list",
+    prompt:`For each scenario, decide whether data should be collected as <b>Quantitative</b> or <b>Qualitative</b>, and explain why.`,
+    items:[
+      {k:"a", text:"Determining what percentage of students participate in school lunches.", correct:"Quantitative"},
+      {k:"b", text:"Investigating students’ experiences with online learning during the pandemic.", correct:"Qualitative"},
+      {k:"c", text:"Measuring students’ average grade at the end of the school year.", correct:"Quantitative"},
+      {k:"d", text:"Determining parents’ opinions on the quality of school communication.", correct:"Qualitative"},
+      {k:"e", text:"Examining how many hours per day students spend in front of a screen.", correct:"Quantitative"},
+      {k:"f", text:"Tracking how many students participated in a specific school trip.", correct:"Quantitative"},
+      {k:"g", text:"Determining how students evaluate their stress level before final exams.", correct:"Qualitative"},
+      {k:"h", text:"Analyzing how teachers adapt methods for students with different learning needs.", correct:"Qualitative"},
+      {k:"i", text:"Examining how many hours per week teachers spend preparing lessons.", correct:"Quantitative"},
+      {k:"j", text:"Determining strategies students use during group work.", correct:"Qualitative"},
+    ],
+    solutionHtml:`<div class="solution"><ul>
+      <li>a Quantitative</li><li>b Qualitative</li><li>c Quantitative</li><li>d Qualitative</li><li>e Quantitative</li>
+      <li>f Quantitative</li><li>g Qualitative</li><li>h Qualitative</li><li>i Quantitative</li><li>j Qualitative</li>
+    </ul></div>`
+  },
+  { id:"1.7", title:"Create your own examples", type:"multi_text",
+    prompt:`Invent one example of quantitative data and one of qualitative data that could be collected in educational research. Explain why you classified them that way.`,
+    fields:[{key:"quant",label:"Quantitative example + explanation"},{key:"qual",label:"Qualitative example + explanation"}],
+    solutionHtml:`<div class="solution"><p><b>Quantitative:</b> Number of incorrect answers in a math test.</p><p><b>Qualitative:</b> Description of feelings during presentations.</p></div>`
+  },
+  { id:"1.8", title:"One quantitative + one qualitative question", type:"multi_text",
+    prompt:`Imagine you are leading a study on a new teaching method. Write one question that yields quantitative data and one that yields qualitative data.`,
+    fields:[{key:"q_quant",label:"Quantitative question"},{key:"q_qual",label:"Qualitative question"}],
+    solutionHtml:`<div class="solution"><p><b>Quantitative:</b> “What percentage of students improved their test scores?”</p><p><b>Qualitative:</b> “What are your impressions of the new method?”</p></div>`
+  },
+  { id:"1.9", title:"Identify variables (IV, DV, mediator)", type:"var_scenarios",
+    prompt:`For each scenario, identify the <b>independent</b>, <b>dependent</b>, and <b>intervening/mediating</b> variable.`,
+    scenarios:[
+      {k:"a", text:"Interactive whiteboards → math results; also student engagement is observed.",
+       sol:{iv:"Introduction of interactive whiteboards", dv:"Mathematics results", med:"Student engagement during instruction"}},
+      {k:"b", text:"New reading literacy program → reading comprehension; also time spent reading outside school.",
+       sol:{iv:"Use of new reading literacy program", dv:"Reading comprehension ability", med:"Time spent reading outside school"}},
+      {k:"c", text:"Longer class periods → understanding content; also level of concentration.",
+       sol:{iv:"Length of class periods", dv:"Understanding of the content", med:"Students’ level of concentration"}},
+      {k:"d", text:"Stress-reduction program → exam results; also stress level.",
+       sol:{iv:"Introduction of stress-reduction program", dv:"Exam results", med:"Students’ stress level"}},
+      {k:"e", text:"Extracurricular participation → academic performance; also time organization.",
+       sol:{iv:"Participation in extracurricular activities", dv:"Academic performance", med:"Students’ time organization"}},
+    ],
+    solutionHtml:`<div class="solution"><p>Use “Show suggested variables” inside each scenario.</p></div>`
+  },
+  { id:"1.10", title:"Classify variables", type:"multi_text",
+    prompt:`Classify the listed variables as independent, dependent, or intervening and explain why (short justifications).`,
+    fields:[
+      {key:"v1", label:"Frequency of homework use in the classroom"},
+      {key:"v2", label:"Students’ self-confidence after receiving feedback"},
+      {key:"v3", label:"Math test results after introducing a new teaching method"},
+      {key:"v4", label:"Motivation level after participation in a motivational program"},
+      {key:"v5", label:"Amount of time spent preparing for exams"},
+      {key:"v6", label:"Use of multimedia instructional materials"},
+      {key:"v7", label:"Frequency of student interaction during group work"},
+      {key:"v8", label:"Test performance after introducing a new assessment approach"},
+      {key:"v9", label:"Engagement after introducing gamification"},
+      {key:"v10", label:"Stress level during exams depending on preparation period length"},
+    ],
+    solutionHtml:`<div class="solution"><ul>
+      <li>Homework frequency – Independent</li>
+      <li>Self-confidence after feedback – Intervening</li>
+      <li>Math test results after new method – Dependent</li>
+      <li>Motivation after program – Dependent</li>
+      <li>Time preparing – Independent</li>
+      <li>Multimedia materials – Independent</li>
+      <li>Interaction frequency – Intervening</li>
+      <li>Test performance after new assessment – Dependent</li>
+      <li>Engagement after gamification – Dependent</li>
+      <li>Stress depending on preparation length – Intervening</li>
+    </ul></div>`
+  },
+  { id:"1.11", title:"Suggest control variables", type:"multi_text",
+    prompt:`Identify possible control variables for each scenario to reduce bias.`,
+    fields:[
+      {key:"c1", label:"Scenario 1: tablets & performance across different socioeconomic backgrounds"},
+      {key:"c2", label:"Scenario 2: longer classes & math performance in urban vs rural schools"},
+      {key:"c3", label:"Scenario 3: gamification & motivation across school types"},
+      {key:"c4", label:"Scenario 4: tutoring & English results across family backgrounds"},
+      {key:"c5", label:"Scenario 5: visual aids & understanding across grade levels"},
+    ],
+    solutionHtml:`<div class="solution">
+      <p><b>1:</b> SES, prior achievement, age.</p>
+      <p><b>2:</b> location, access to resources, class size.</p>
+      <p><b>3:</b> school type, baseline motivation, tech equipment.</p>
+      <p><b>4:</b> parental support, baseline English, tutoring intensity.</p>
+      <p><b>5:</b> age, prior knowledge, teacher skill.</p>
+    </div>`
+  },
+  { id:"1.12", title:"Propose IV/DV/Mediator", type:"multi_text",
+    prompt:`For each situation, propose one independent, one dependent, and one intervening variable (one line each).`,
+    fields:[
+      {key:"s1", label:"Breaks → concentration (long blocks)"},
+      {key:"s2", label:"Group work → critical thinking"},
+      {key:"s3", label:"Family support → academic success (low-income)"},
+      {key:"s4", label:"Morning exercise → academic performance (morning classes)"},
+      {key:"s5", label:"Interactive games → vocabulary"},
+      {key:"s6", label:"Homework → study discipline"},
+      {key:"s7", label:"Art activities → creativity"},
+      {key:"s8", label:"Tablets/tech → understanding complex math concepts"},
+      {key:"s9", label:"Teacher-led discussions → argumentation skills"},
+    ],
+    solutionHtml:`<div class="solution"><ol>
+      <li>IV: break frequency; DV: concentration; Med: fatigue</li>
+      <li>IV: group work; DV: critical thinking; Med: cooperation</li>
+      <li>IV: family support; DV: academic success; Med: self-confidence</li>
+      <li>IV: exercise; DV: performance; Med: energy</li>
+      <li>IV: games; DV: vocabulary; Med: interest</li>
+      <li>IV: homework; DV: discipline; Med: time management</li>
+      <li>IV: art; DV: creativity; Med: emotional expression</li>
+      <li>IV: tech use; DV: understanding; Med: interactivity</li>
+      <li>IV: discussion style; DV: argumentation; Med: participation</li>
+    </ol></div>`
+  },
+  { id:"1.13", title:"Discuss confounders + control", type:"textarea",
+    prompt:`Choose one variable and discuss other factors influencing it. How would you control them?`,
+    key:"essay_1_13",
+    solutionHtml:`<div class="solution"><p><b>Example:</b> Standardize feedback and include school climate/family support as control variables.</p></div>`
+  },
+  { id:"1.14", title:"Formulate 3 research questions", type:"multi_text",
+    prompt:`Formulate three specific research questions about how online home-learning platforms affect learning.`,
+    fields:[{key:"rq1",label:"Research question 1"},{key:"rq2",label:"Research question 2"},{key:"rq3",label:"Research question 3"}],
+    solutionHtml:`<div class="solution"><p>Examples: subject-grade comparisons; attitudes→motivation; digital literacy for regular vs sporadic users.</p></div>`
+  },
+  { id:"1.15", title:"Evaluate questions + improve", type:"multi_text",
+    prompt:`Evaluate these questions and propose improvements.`,
+    fields:[
+      {key:"q1", label:"1) “What are students’ experiences with online education?” – evaluation + improved version"},
+      {key:"q2", label:"2) “Does using tablets affect academic performance?” – evaluation + improved version"},
+      {key:"q3", label:"3) “Is online instruction more effective than traditional instruction?” – evaluation + improved version"},
+    ],
+    solutionHtml:`<div class="solution"><p>Make them more specific: define context, outcomes, and metrics.</p></div>`
+  },
+  { id:"1.16", title:"Convert RQs to hypotheses", type:"multi_text",
+    prompt:`Convert the research questions into H0 and H1 (plus measurement definitions).`,
+    fields:[{key:"h1",label:"Exercise → stress: H0 and H1"},{key:"h2",label:"Interactive software → math results: H0 and H1"}],
+    solutionHtml:`<div class="solution"><p>H0: no effect; H1: expected effect (stress ↓; math results ↑); define measures.</p></div>`
+  },
+  { id:"1.17", title:"Research plan", type:"textarea",
+    prompt:`Pick one hypothesis and propose a research plan: sampling, data collection, tests, interpretation, ethics.`,
+    key:"plan_1_17",
+    solutionHtml:`<div class="solution"><p>Include baseline, intervention/control groups, appropriate tests, and ethical safeguards.</p></div>`
+  },
+  { id:"1.18", title:"Interpret p-value result", type:"textarea",
+    prompt:`Interpret: p = 0.04, mean improvement 5% higher than control (time-management apps).`,
+    key:"interp_1_18",
+    solutionHtml:`<div class="solution"><p>p=0.04&lt;0.05 ⇒ reject H0; discuss practical meaning and replication.</p></div>`
+  },
+  { id:"1.19", title:"3 types of research questions", type:"multi_text",
+    prompt:`Formulate descriptive, comparative, and causal questions about extracurricular activities and social skills.`,
+    fields:[{key:"desc",label:"Descriptive question"},{key:"comp",label:"Comparative question"},{key:"caus",label:"Causal question"}],
+    solutionHtml:`<div class="solution"><p>Descriptive (which skills), Comparative (participants vs non), Causal (effect of participation).</p></div>`
+  },
+  { id:"1.20", title:"Probability – simple", type:"numeric",
+    prompt:`In a class of 30 students, 18 are women. Probability(selected student is a woman)?`,
+    key:"p_1_20", solutionValue:"0.60",
+    solutionHtml:`<div class="solution"><p>18/30 = 0.60 = 60%.</p></div>`
+  },
+  { id:"1.21", title:"Empirical probability", type:"numeric",
+    prompt:`200 late-arrival cases; 40 students late >5×. Empirical probability?`,
+    key:"p_1_21", solutionValue:"0.20",
+    solutionHtml:`<div class="solution"><p>40/200 = 0.20 = 20%.</p></div>`
+  },
+  { id:"1.22", title:"Subjective probability", type:"textarea",
+    prompt:`Estimate probability a new homework type improves outcomes (justify).`,
+    key:"subj_1_22",
+    solutionHtml:`<div class="solution"><p>Use past experience, student response, colleague feedback, theoretical rationale; e.g., 25%.</p></div>`
+  },
+  { id:"1.23", title:"Probability distribution table (5 bins)", type:"table_bins",
+    prompt:`Create a probability distribution with 5 bins (0–20, 21–40, 41–60, 61–80, 81–100).`,
+    bins:[
+      {range:"0–20", correctCount:6, correctProb:"20%"},
+      {range:"21–40", correctCount:7, correctProb:"23.33%"},
+      {range:"41–60", correctCount:5, correctProb:"16.67%"},
+      {range:"61–80", correctCount:8, correctProb:"26.67%"},
+      {range:"81–100", correctCount:4, correctProb:"13.33%"},
+    ],
+    solutionHtml:`<div class="solution"><ul>
+      <li>0–20: 6 (20%)</li><li>21–40: 7 (23.33%)</li><li>41–60: 5 (16.67%)</li>
+      <li>61–80: 8 (26.67%)</li><li>81–100: 4 (13.33%)</li>
+    </ul></div>`
+  },
+  { id:"1.24", title:"Write a hypothesis with IV/DV/mediator", type:"textarea",
+    prompt:`Create a hypothesis with IV, DV and mediator; describe how to test it.`,
+    key:"hyp_1_24",
+    solutionHtml:`<div class="solution"><p>Example: online tools (IV) → achievement (DV) via interest (mediator). Compare classes, measure interest and outcomes.</p></div>`
+  },
+  { id:"1.25", title:"Design study + minimize Type I/II errors", type:"textarea",
+    prompt:`Design a study for a new primary-school math method: H0/H1 + how to minimize Type I and II errors.`,
+    key:"design_1_25",
+    solutionHtml:`<div class="solution"><p>Stricter α to reduce Type I; larger sample for power; control confounders; appropriate test (t-test/ANOVA).</p></div>`
+  },
+  { id:"1.26", title:"Interpret p-value (t-test)", type:"textarea",
+    prompt:`Traditional vs interactive classes; p = 0.0008. Interpret.`,
+    key:"interp_1_26",
+    solutionHtml:`<div class="solution"><p>p&lt;0.05 ⇒ reject H0; statistically significant difference between methods.</p></div>`
+  },
+  { id:"1.27", title:"Cohen’s d + statistical & practical significance", type:"calc_cohen",
+    prompt:`Compute Cohen’s d and interpret (A mean=82, B mean=84, SD=10, p=0.04).`,
+    fields:[{key:"d",label:"Cohen’s d (numeric)"},{key:"sig",label:"Statistical significance interpretation"},{key:"prac",label:"Practical significance discussion"}],
+    solutionHtml:`<div class="solution">
+      <p><b>d:</b> (84−82)/10 = 0.2 (small effect)</p>
+      <p><b>p:</b> 0.04 &lt; 0.05 ⇒ significant</p>
+      <p><b>Practical:</b> small effect; weigh costs/logistics; consider longer-term evidence.</p>
+    </div>`
+  },
+];
+
+const STORAGE_KEY = "chapter1_interactive_answers_v1";
+let state = loadState();
+
+function loadState(){ try{ const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : {}; }catch(e){ return {}; } }
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); updateProgress(); }
+function resetState(){ if(!confirm("Reset all saved answers?")) return; state = {}; saveState(); renderCurrent(); renderList(); }
+
+let currentIndex = 0;
+const taskListEl = document.getElementById("taskList");
+const questionHeaderEl = document.getElementById("questionHeader");
+const answerAreaEl = document.getElementById("answerArea");
+const countTextEl = document.getElementById("countText");
+const progressBarEl = document.getElementById("progressBar");
+const progressTextEl = document.getElementById("progressText");
+
+function renderList(){
+  taskListEl.innerHTML = "";
+  TASKS.forEach((t, idx) => {
+    const done = isTaskDone(t);
+    const div = document.createElement("div");
+    div.className = "item" + (idx===currentIndex ? " active":"");
+    div.onclick = () => { currentIndex = idx; renderCurrent(); renderList(); };
+    const left = document.createElement("div");
+    const title = document.createElement("div");
+    title.className = "qtitle";
+    title.textContent = `Task ${t.id}`;
+    const desc = document.createElement("div");
+    desc.className = "qdesc";
+    desc.textContent = t.title;
+    left.appendChild(title); left.appendChild(desc);
+
+    const tag = document.createElement("div");
+    tag.className = "tag " + (done ? "done":"todo");
+    tag.textContent = done ? "Done" : "To do";
+    div.appendChild(left); div.appendChild(tag);
+    taskListEl.appendChild(div);
+  });
+  countTextEl.textContent = `${TASKS.length} tasks`;
+}
+
+function renderCurrent(){
+  const t = TASKS[currentIndex];
+  questionHeaderEl.innerHTML = `
+    <div class="meta">Task ${t.id} • ${t.title}</div>
+    <h3>${escapeHtml(t.title)}</h3>
+    <p>${t.prompt}</p>
+  `;
+
+  answerAreaEl.innerHTML = "";
+  const content = document.createElement("div");
+
+  if(t.type === "textarea"){
+    content.appendChild(renderTextarea(t.key));
+  }else if(t.type === "numeric"){
+    content.appendChild(renderNumeric(t.key, t.solutionValue));
+  }else if(t.type === "multi_text"){
+    t.fields.forEach(f => content.appendChild(renderLabeledTextarea(`${t.id}.${f.key}`, f.label)));
+  }else if(t.type === "mc_matrix"){
+    content.appendChild(renderMatrixSelect(t));
+  }else if(t.type === "qa_list"){
+    content.appendChild(renderQaList(t));
+  }else if(t.type === "var_scenarios"){
+    content.appendChild(renderVarScenarios(t));
+  }else if(t.type === "table_bins"){
+    content.appendChild(renderBinsTable(t));
+  }else if(t.type === "calc_cohen"){
+    t.fields.forEach(f => {
+      if(f.key === "d") content.appendChild(renderLabeledNumber(`${t.id}.${f.key}`, f.label));
+      else content.appendChild(renderLabeledTextarea(`${t.id}.${f.key}`, f.label, 90));
+    });
+  }else{
+    const p = document.createElement("p");
+    p.textContent = "Unsupported task type.";
+    content.appendChild(p);
+  }
+
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = "Show solution";
+  details.appendChild(summary);
+  const solWrap = document.createElement("div");
+  solWrap.innerHTML = t.solutionHtml || `<div class="solution"><p>No solution provided.</p></div>`;
+  details.appendChild(solWrap);
+  content.appendChild(details);
+
+  answerAreaEl.appendChild(content);
+  updateNavButtons();
+  updateProgress();
+}
+
+function renderTextarea(key){
+  const wrap = document.createElement("div");
+  const ta = document.createElement("textarea");
+  ta.value = state[key] || "";
+  ta.placeholder = "Write your answer here…";
+  ta.addEventListener("input", () => { state[key] = ta.value; saveState(); renderList(); });
+  wrap.appendChild(ta);
+  return wrap;
+}
+
+function renderNumeric(key, expected){
+  const wrap = document.createElement("div");
+  const label = document.createElement("label");
+  label.textContent = "Your numeric answer";
+  const input = document.createElement("input");
+  input.type = "number"; input.step = "any";
+  input.placeholder = "e.g., 0.6";
+  input.value = state[key] ?? "";
+  input.addEventListener("input", () => { state[key] = input.value; saveState(); renderList(); });
+
+  const hint = document.createElement("div");
+  hint.className = "mini";
+  hint.style.marginTop = "8px";
+  hint.textContent = "Tip: decimals are fine (e.g., 0.60).";
+
+  wrap.appendChild(label); wrap.appendChild(input); wrap.appendChild(hint);
+
+  const checkRow = document.createElement("div");
+  checkRow.className = "row";
+  checkRow.style.marginTop = "10px";
+  const btn = document.createElement("button");
+  btn.className = "btn secondary";
+  btn.textContent = "Check (approx.)";
+  const out = document.createElement("div");
+  out.className = "mini";
+  out.style.marginLeft = "6px";
+  btn.onclick = () => {
+    const v = parseFloat(input.value);
+    const e = parseFloat(expected);
+    if(Number.isNaN(v)){ out.textContent = "Enter a number first."; out.style.color="rgba(245,158,11,.95)"; return; }
+    const ok = Math.abs(v - e) < 1e-6;
+    out.textContent = ok ? "✓ Looks correct." : "Not matching expected value (try again, then open solution).";
+    out.style.color = ok ? "rgba(34,197,94,.95)" : "rgba(245,158,11,.95)";
+  };
+  checkRow.appendChild(btn); checkRow.appendChild(out);
+  wrap.appendChild(checkRow);
+  return wrap;
+}
+
+function renderLabeledTextarea(key, labelText, minHeight=120){
+  const wrap = document.createElement("div");
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  const ta = document.createElement("textarea");
+  ta.style.minHeight = minHeight + "px";
+  ta.value = state[key] || "";
+  ta.placeholder = "Type here…";
+  ta.addEventListener("input", () => { state[key] = ta.value; saveState(); renderList(); });
+  wrap.appendChild(label); wrap.appendChild(ta);
+  return wrap;
+}
+
+function renderLabeledNumber(key, labelText){
+  const wrap = document.createElement("div");
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  const input = document.createElement("input");
+  input.type="number"; input.step="any";
+  input.value = state[key] ?? "";
+  input.placeholder = "e.g., 0.2";
+  input.addEventListener("input",()=>{ state[key]=input.value; saveState(); renderList(); });
+  wrap.appendChild(label); wrap.appendChild(input);
+  return wrap;
+}
+
+function renderMatrixSelect(task){
+  const wrap = document.createElement("div");
+  task.rows.forEach(r => {
+    const row = document.createElement("div");
+    row.style.marginBottom = "12px";
+    const label = document.createElement("label");
+    label.textContent = r.text;
+    const sel = document.createElement("select");
+    sel.innerHTML = `<option value="">— choose —</option>` + task.options.map(o=>`<option>${o}</option>`).join("");
+    const skey = `${task.id}.${r.k}`;
+    sel.value = state[skey] || "";
+    sel.addEventListener("change", () => { state[skey] = sel.value; saveState(); renderList(); });
+
+    row.appendChild(label); row.appendChild(sel);
+    wrap.appendChild(row);
+  });
+
+  const check = document.createElement("button");
+  check.className = "btn secondary";
+  check.textContent = "Check selections";
+  const out = document.createElement("div");
+  out.className = "mini";
+  out.style.marginTop = "8px";
+  check.onclick = () => {
+    const total = task.rows.length;
+    let correct = 0, answered = 0;
+    task.rows.forEach(r=>{
+      const v = state[`${task.id}.${r.k}`];
+      if(v) answered++;
+      if(v === r.correct) correct++;
+    });
+    out.textContent = `Answered: ${answered}/${total} • Correct: ${correct}/${total}`;
+    out.style.color = correct===total ? "rgba(34,197,94,.95)" : "rgba(245,158,11,.95)";
+  };
+  wrap.appendChild(check); wrap.appendChild(out);
+  return wrap;
+}
+
+function renderQaList(task){
+  const wrap = document.createElement("div");
+  task.items.forEach(it=>{
+    const block = document.createElement("div");
+    block.style.marginBottom = "14px";
+    const label = document.createElement("label");
+    label.textContent = it.text;
+
+    const sel = document.createElement("select");
+    sel.innerHTML = `<option value="">— choose —</option><option>Quantitative</option><option>Qualitative</option>`;
+    const kSel = `${task.id}.${it.k}.choice`;
+    sel.value = state[kSel] || "";
+    sel.addEventListener("change", () => { state[kSel] = sel.value; saveState(); renderList(); });
+
+    const ta = document.createElement("textarea");
+    ta.style.minHeight = "90px";
+    const kExp = `${task.id}.${it.k}.why`;
+    ta.value = state[kExp] || "";
+    ta.placeholder = "Explain your choice…";
+    ta.addEventListener("input", () => { state[kExp] = ta.value; saveState(); renderList(); });
+
+    block.appendChild(label); block.appendChild(sel); block.appendChild(ta);
+    wrap.appendChild(block);
+  });
+
+  const check = document.createElement("button");
+  check.className="btn secondary";
+  check.textContent="Check choices";
+  const out = document.createElement("div");
+  out.className="mini";
+  out.style.marginTop="8px";
+  check.onclick=()=>{
+    let total=task.items.length, correct=0, answered=0;
+    task.items.forEach(it=>{
+      const v = state[`${task.id}.${it.k}.choice`];
+      if(v) answered++;
+      if(v===it.correct) correct++;
+    });
+    out.textContent=`Answered: ${answered}/${total} • Correct choices: ${correct}/${total} (explanations not auto-graded)`;
+    out.style.color = correct===total ? "rgba(34,197,94,.95)" : "rgba(245,158,11,.95)";
+  };
+  wrap.appendChild(check); wrap.appendChild(out);
+  return wrap;
+}
+
+function renderVarScenarios(task){
+  const wrap = document.createElement("div");
+  task.scenarios.forEach(sc=>{
+    const card = document.createElement("div");
+    card.style.border = "1px solid rgba(255,255,255,.12)";
+    card.style.borderRadius = "12px";
+    card.style.padding = "12px";
+    card.style.marginBottom = "12px";
+    card.style.background = "rgba(255,255,255,.03)";
+
+    const p = document.createElement("p");
+    p.innerHTML = `<b>Scenario:</b> ${escapeHtml(sc.text)}`;
+    p.style.marginTop="0";
+    card.appendChild(p);
+
+    const grid = document.createElement("div");
+    grid.className="grid2";
+    grid.appendChild(renderSmallText(`${task.id}.${sc.k}.iv`, "Independent variable (IV)"));
+    grid.appendChild(renderSmallText(`${task.id}.${sc.k}.dv`, "Dependent variable (DV)"));
+    grid.appendChild(renderSmallText(`${task.id}.${sc.k}.med`, "Intervening / mediating variable"));
+    card.appendChild(grid);
+
+    const det = document.createElement("details");
+    const sum = document.createElement("summary");
+    sum.textContent = "Show suggested variables";
+    det.appendChild(sum);
+    const sol = document.createElement("div");
+    sol.className="solution";
+    sol.innerHTML = `<p><b>IV:</b> ${escapeHtml(sc.sol.iv)}</p><p><b>DV:</b> ${escapeHtml(sc.sol.dv)}</p><p><b>Mediator:</b> ${escapeHtml(sc.sol.med)}</p>`;
+    det.appendChild(sol);
+    card.appendChild(det);
+
+    wrap.appendChild(card);
+  });
+  return wrap;
+}
+
+function renderSmallText(key, labelText){
+  const wrap = document.createElement("div");
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  const input = document.createElement("input");
+  input.type="text";
+  input.value = state[key] || "";
+  input.placeholder = "Type here…";
+  input.addEventListener("input",()=>{ state[key]=input.value; saveState(); renderList(); });
+  wrap.appendChild(label); wrap.appendChild(input);
+  return wrap;
+}
+
+function renderBinsTable(task){
+  const wrap = document.createElement("div");
+  const table = document.createElement("div");
+  table.style.display="grid";
+  table.style.gridTemplateColumns="1.2fr .8fr .8fr";
+  table.style.gap="10px";
+  table.style.alignItems="end";
+
+  const h1=document.createElement("div"); h1.className="mini"; h1.textContent="Score range";
+  const h2=document.createElement("div"); h2.className="mini"; h2.textContent="Count";
+  const h3=document.createElement("div"); h3.className="mini"; h3.textContent="Probability (%)";
+  table.appendChild(h1); table.appendChild(h2); table.appendChild(h3);
+
+  task.bins.forEach((b, idx)=>{
+    const r = document.createElement("div");
+    r.textContent = b.range;
+    r.style.padding="10px 12px";
+    r.style.border="1px solid rgba(255,255,255,.12)";
+    r.style.borderRadius="12px";
+    r.style.background="rgba(255,255,255,.03)";
+
+    const cKey = `${task.id}.bin${idx}.count`;
+    const pKey = `${task.id}.bin${idx}.prob`;
+
+    const count = document.createElement("input");
+    count.type="number"; count.step="1";
+    count.value = state[cKey] ?? "";
+    count.placeholder = "e.g., 6";
+    count.addEventListener("input",()=>{ state[cKey]=count.value; saveState(); renderList(); });
+
+    const prob = document.createElement("input");
+    prob.type="text";
+    prob.value = state[pKey] ?? "";
+    prob.placeholder = "e.g., 20%";
+    prob.addEventListener("input",()=>{ state[pKey]=prob.value; saveState(); renderList(); });
+
+    table.appendChild(r); table.appendChild(count); table.appendChild(prob);
+  });
+
+  wrap.appendChild(table);
+
+  const check = document.createElement("button");
+  check.className="btn secondary";
+  check.style.marginTop="12px";
+  check.textContent="Check table (counts only)";
+  const out = document.createElement("div");
+  out.className="mini";
+  out.style.marginTop="8px";
+  check.onclick=()=>{
+    let ok=true, answered=0;
+    task.bins.forEach((b, idx)=>{
+      const v = parseInt(state[`${task.id}.bin${idx}.count`],10);
+      if(!Number.isNaN(v)) answered++;
+      if(v !== b.correctCount) ok=false;
+    });
+    out.textContent = ok ? "✓ Counts match expected solution." : `Counts do not match expected solution (answered ${answered}/${task.bins.length}).`;
+    out.style.color = ok ? "rgba(34,197,94,.95)" : "rgba(245,158,11,.95)";
+  };
+  wrap.appendChild(check); wrap.appendChild(out);
+  return wrap;
+}
+
+function isTaskDone(task){
+  if(task.type==="textarea"){
+    return !!(state[task.key] && state[task.key].trim().length>0);
+  }
+  if(task.type==="numeric"){
+    return state[task.key] !== undefined && String(state[task.key]).trim()!=="";
+  }
+  if(task.type==="multi_text"){
+    return task.fields.every(f=>{
+      const k = `${task.id}.${f.key}`;
+      return state[k] && String(state[k]).trim().length>0;
+    });
+  }
+  if(task.type==="mc_matrix"){
+    return task.rows.every(r=>{
+      const k = `${task.id}.${r.k}`;
+      return state[k] && String(state[k]).trim().length>0;
+    });
+  }
+  if(task.type==="qa_list"){
+    return task.items.every(it=>{
+      const kSel = `${task.id}.${it.k}.choice`;
+      const kWhy = `${task.id}.${it.k}.why`;
+      return (state[kSel] && String(state[kSel]).trim()) && (state[kWhy] && String(state[kWhy]).trim());
+    });
+  }
+  if(task.type==="var_scenarios"){
+    return task.scenarios.every(sc=>{
+      return ["iv","dv","med"].every(x=>{
+        const k = `${task.id}.${sc.k}.${x}`;
+        return state[k] && String(state[k]).trim().length>0;
+      });
+    });
+  }
+  if(task.type==="table_bins"){
+    return task.bins.every((b, idx)=>{
+      const cKey = `${task.id}.bin${idx}.count`;
+      const pKey = `${task.id}.bin${idx}.prob`;
+      return (state[cKey] && String(state[cKey]).trim()) && (state[pKey] && String(state[pKey]).trim());
+    });
+  }
+  if(task.type==="calc_cohen"){
+    return task.fields.every(f=>{
+      const k = `${task.id}.${f.key}`;
+      return state[k] && String(state[k]).trim().length>0;
+    });
+  }
+  return false;
+}
+
+function updateProgress(){
+  const total = TASKS.length;
+  const done = TASKS.filter(isTaskDone).length;
+  progressTextEl.textContent = `${done}/${total}`;
+  const pct = total ? (done/total)*100 : 0;
+  progressBarEl.style.width = pct.toFixed(1) + "%";
+}
+
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+prevBtn.onclick = () => { if(currentIndex>0){ currentIndex--; renderCurrent(); renderList(); } };
+nextBtn.onclick = () => { if(currentIndex<TASKS.length-1){ currentIndex++; renderCurrent(); renderList(); } };
+function updateNavButtons(){
+  prevBtn.disabled = currentIndex===0;
+  nextBtn.disabled = currentIndex===TASKS.length-1;
+  prevBtn.style.opacity = prevBtn.disabled ? .55 : 1;
+  nextBtn.style.opacity = nextBtn.disabled ? .55 : 1;
+}
+
+function buildExportObject(){
+  return {
+    generatedAt: new Date().toISOString(),
+    tasks: TASKS.map(t=>({ id:t.id, title:t.title, answers: extractAnswersForTask(t) }))
+  };
+}
+function extractAnswersForTask(t){
+  const ans = {};
+  if(t.type==="textarea") ans[t.key] = state[t.key] || "";
+  else if(t.type==="numeric") ans[t.key] = state[t.key] ?? "";
+  else if(t.type==="multi_text") t.fields.forEach(f=> ans[f.label] = state[`${t.id}.${f.key}`] || "");
+  else if(t.type==="mc_matrix") t.rows.forEach(r=> ans[r.text] = state[`${t.id}.${r.k}`] || "");
+  else if(t.type==="qa_list") t.items.forEach(it=> ans[it.text] = { choice: state[`${t.id}.${it.k}.choice`] || "", explanation: state[`${t.id}.${it.k}.why`] || "" });
+  else if(t.type==="var_scenarios") t.scenarios.forEach(sc=> ans[sc.text] = { IV: state[`${t.id}.${sc.k}.iv`] || "", DV: state[`${t.id}.${sc.k}.dv`] || "", Mediator: state[`${t.id}.${sc.k}.med`] || "" });
+  else if(t.type==="table_bins") t.bins.forEach((b,idx)=> ans[b.range] = { count: state[`${t.id}.bin${idx}.count`] ?? "", probability: state[`${t.id}.bin${idx}.prob`] ?? "" });
+  else if(t.type==="calc_cohen") t.fields.forEach(f=> ans[f.label] = state[`${t.id}.${f.key}`] ?? "");
+  return ans;
+}
+function download(filename, content, mime="application/octet-stream"){
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+document.getElementById("exportBtn").onclick = () => download("chapter1_answers.json", JSON.stringify(buildExportObject(), null, 2), "application/json");
+document.getElementById("exportTxtBtn").onclick = () => {
+  const obj = buildExportObject();
+  const lines = ["Chapter 1 – Answers", "Generated at: "+obj.generatedAt, ""];
+  obj.tasks.forEach(t=>{ lines.push(`TASK ${t.id}: ${t.title}`); lines.push("-".repeat(60)); lines.push(JSON.stringify(t.answers, null, 2)); lines.push(""); });
+  download("chapter1_answers.txt", lines.join("\n"), "text/plain");
+};
+document.getElementById("copyBtn").onclick = async () => {
+  const text = JSON.stringify(buildExportObject(), null, 2);
+  try{ await navigator.clipboard.writeText(text); alert("Answers copied to clipboard as JSON."); }
+  catch(e){ alert("Clipboard copy failed. Use the download buttons instead."); }
+};
+document.getElementById("resetBtn").onclick = resetState;
+
+window.addEventListener("keydown", (e)=>{
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==="s"){
+    e.preventDefault(); saveState(); alert("Saved (autosave also runs continuously).");
+  }
+});
+
+function escapeHtml(str){
+  return String(str).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
+renderList();
+renderCurrent();
+updateProgress();
+</script>
+</body>
+</html>
